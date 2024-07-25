@@ -98,8 +98,10 @@ internal class ClassScannerKsp {
         // Check that the annotation really is present. It should always be the case, but it's
         // a safetynet in case the generated properties are out of sync.
         clazz.annotations.any {
-          it.annotationType.resolve()
-            .toClassName().fqName == annotation && (scope == null || it.scope() == scope)
+          val type = it.annotationType.resolve()
+          if (type.isError) return@any false
+
+          type.toClassName().fqName == annotation && (scope == null || it.scope() == scope)
         }
       }
       .onEach { clazz ->
